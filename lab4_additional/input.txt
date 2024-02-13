@@ -1,4 +1,5 @@
 a*b*c
-S -> a S bb
-S -> a S b
-S ->
+S -> A c
+A -> S D
+D -> a D
+A -> a
