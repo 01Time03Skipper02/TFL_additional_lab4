@@ -73,7 +73,39 @@ void deleteNonGenerativeRules(std::vector <Rule>& G) {
 }
 
 void deleteNonAchievableRules(std::vector <Rule>& G) {
+    std::set <char> reachable_terms;
+    reachable_terms.insert('S');
+    int set_size = reachable_terms.size();
+    while(1) {
+        for (auto rule : G) {
+            if (reachable_terms.count(rule.left[0])) {
+                std::vector <char> nonterms = getNonterminals(rule);
+                for (auto term : nonterms) {
+                    reachable_terms.insert(term);
+                }
+            }
+        }
+        if (reachable_terms.size() > set_size) {
+            set_size = reachable_terms.size();
+        }
+        else break;
+    }
 
+    for (int i = 0; i < G.size(); i++) {
+        if (!reachable_terms.count(G[i].left[0])) {
+            G.erase(G.begin() + i);
+            i--;
+            continue;
+        }
+        std::vector <char> nonterms = getNonterminals(G[i]);
+        for (auto term : nonterms) {
+            if (!reachable_terms.count(term)) {
+                G.erase(G.begin() + i);
+                i--;
+                break;
+            }
+        }
+    }
 }
 
 int main() {
@@ -98,7 +130,10 @@ int main() {
         G.push_back({left, right});
         right.clear();
     }
+
     deleteNonGenerativeRules(G);
+    deleteNonAchievableRules(G);
+
     for (auto rule : G) {
         showRule(rule);
     }
