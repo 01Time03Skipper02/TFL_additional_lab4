@@ -31,10 +31,17 @@ public:
     void print_transition_matrix();
     void print_end_vector();
     void show_automaton();
+    void show_like_arrows();
+    void dfs_transpon(int vertex);
+    automaton get_addition_automaton();
 
     automaton(std::vector<int> p_start_states,
               std::vector<std::vector<std::pair<std::string, bool>>> p_transition_matrix,
               std::vector<int> p_end_states);
+    automaton(std::vector<int> p_start_states,
+              std::vector<std::vector<std::pair<std::string, bool>>> p_transition_matrix,
+              std::vector<int> p_end_states,
+              std::vector<bool> p_visited);
 };
 
 void automaton::print_start_vector() {
@@ -276,9 +283,35 @@ automaton::automaton(std::vector <int> p_start_states, std::vector <std::vector 
     end_states = std::move(p_end_states);
     visited = std::vector<bool>(start_states.size(), false);
 }
+automaton::automaton(std::vector <int> p_start_states, std::vector <std::vector <std::pair<std::string, bool>>> p_transition_matrix, std::vector <int> p_end_states, std::vector<bool> p_visited) {
+    start_states = std::move(p_start_states);
+    transition_matrix = std::move(p_transition_matrix);
+    end_states = std::move(p_end_states);
+    visited = std::move(p_visited);
+}
 
 std::vector<int> automaton::get_start_states() {
     return start_states;
+}
+
+void automaton::show_like_arrows() {
+    std::cout << "digraph G {" << std::endl;
+    std::cout << "rankdir=\"LR\";" << std::endl;
+    for (int i = 0; i < this->transition_matrix.size(); i++){
+        for (int j = 0; j < this->transition_matrix.size(); j++){
+            if (this->transition_matrix[i][j].first != "0"){
+                std::cout << std::to_string(i) << " -> " << std::to_string(j) << " [label=\"" << this->transition_matrix[i][j].first << "\"];" << std::endl;
+            }
+        }
+    }
+    for (int i = 0; i < this->end_states.size(); i++){
+        if (this->end_states[i]){
+            std::cout << std::to_string(i) <<  " [label=\"" << std::to_string(i) << "\", shape=doublecircle];" << std::endl;
+        } else {
+            std::cout << std::to_string(i) <<  " [label=\"" << std::to_string(i) << "\", shape=circle];" << std::endl;
+        }
+    }
+    std::cout << "}" << std::endl;
 }
 
 std::vector <std::vector <std::pair<std::string, bool>>> automaton::get_transition_matrix(){
@@ -764,4 +797,97 @@ std::vector <std::pair <std::string, std::string> > to_postfix(const std::vector
     }
 
     return res;
+}
+
+void automaton::dfs_transpon(int vertex) {
+    this->visited[vertex] = true;
+    for (int i = 0; i < this->transition_matrix[vertex].size(); i++){
+        if (this->transition_matrix[i][vertex].first != "0" && !this->visited[i]){
+            dfs_transpon(i);
+        }
+    }
+}
+
+std::vector<std::string> get_alphabet(automaton a){
+    std::vector<std::string> res;
+    for (int i = 0; i < a.get_transition_matrix().size(); i++){
+        for (int j = 0; j < a.get_transition_matrix().size(); j++){
+            if (a.get_transition_matrix()[i][j].first == "0"){
+                continue;
+            }else if (res.empty()){
+                res.push_back(a.get_transition_matrix()[i][j].first);
+            }else if (!(*std::find(res.begin(), res.end(), a.get_transition_matrix()[i][j].first) == a.get_transition_matrix()[i][j].first)){
+                res.push_back(a.get_transition_matrix()[i][j].first);
+            }
+        }
+    }
+    return res;
+}
+
+automaton automaton::get_addition_automaton(){
+    std::vector<std::string> alphabet = get_alphabet({start_states, transition_matrix, end_states});
+
+    std::vector<int> new_start_states = start_states;
+    new_start_states.push_back(0);
+
+    std::vector<std::vector<std::pair<std::string, bool>>> new_transition_matrix = transition_matrix;
+    for (auto & i : new_transition_matrix){
+        i.emplace_back("0", false);
+    }
+    new_transition_matrix.emplace_back(transition_matrix.size() + 1, std::pair<std::string, bool>("0", false));
+
+    std::vector<int> new_end_states = end_states;
+    new_end_states.push_back(0);
+
+    std::vector <bool> new_visited = visited;
+    new_visited.push_back(false);
+
+    for (int i = 0; i < transition_matrix.size(); i++){
+        std::vector<std::string> go_to_trap;
+        for (const auto & j : alphabet){
+            bool flag = false;
+            for (int k = 0; k < transition_matrix.size(); k++){
+                if (transition_matrix[i][k].first == j){
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag){
+                go_to_trap.push_back(j);
+            }
+        }
+        std::string trap_way;
+        if (go_to_trap.empty()){
+            continue;
+        } else if (go_to_trap.size() == 1){
+            trap_way = go_to_trap[0];
+        } else {
+            trap_way = go_to_trap[0];
+            for (int j = 1; j < go_to_trap.size(); j++){
+                trap_way += "|" + go_to_trap[j];
+            }
+        }
+        new_transition_matrix[i][new_transition_matrix.size() - 1].first = trap_way;
+    }
+
+    for (int i = 0; i < new_end_states.size(); i++){
+        if (new_end_states[i]){
+            for (int j = 0; j < new_transition_matrix.size(); j++){
+                new_transition_matrix[i][j].first = "0";
+            }
+            dfs_transpon(i);
+        }
+    }
+
+    for (int i = 0; i < visited.size(); i++){
+        if (!(visited[i])){
+            new_end_states[i] = 1;
+        }
+    }
+    new_end_states[new_end_states.size() - 1] = 1;
+    for(auto && i : this->visited){
+        i = false;
+    }
+
+    return {new_start_states, new_transition_matrix, new_end_states, new_visited};
 }

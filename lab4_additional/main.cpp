@@ -139,6 +139,10 @@ int main() {
     TreeNode* tree = build_tree(postfix);
     auto res = regex_2_automato(tree);
     res.show_automaton();
+    res.show_like_arrows();
+    auto res_addit = res.get_addition_automaton();
+    res_addit.show_automaton();
+    res_addit.show_like_arrows();
 
     return 0;
 }
