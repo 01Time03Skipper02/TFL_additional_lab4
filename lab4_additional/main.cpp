@@ -1,9 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <sstream>
-#include <cassert>
-#include <set>
+#include "automat.cpp"
 
 struct Rule {
     std::string left;
@@ -137,5 +132,13 @@ int main() {
     for (auto rule : G) {
         showRule(rule);
     }
+
+    // regex to automaton
+    std::vector <std::pair <std::string, std::string > > lexemes = lexer(R);
+    std::vector <std::pair <std::string, std::string > > postfix = to_postfix(lexemes);
+    TreeNode* tree = build_tree(postfix);
+    auto res = regex_2_automato(tree);
+    res.show_automaton();
+
     return 0;
 }
