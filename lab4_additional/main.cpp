@@ -54,7 +54,7 @@ int main() {
     WordsGen generator(addit_intersect_g);
     int k = 6;
     std::vector <std::string> words = generator.getWords(k);
-    if (words.empty()){
+    if (words.empty() || (words.size() == 1 and words[0].empty())){
         auto default_intersect_g = main_algo(res, G);
         WordsGen generator_2(default_intersect_g);
         std::vector <std::string> words_2 = generator_2.getWords(k);

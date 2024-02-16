@@ -157,7 +157,6 @@ std::vector<std::pair<std::pair<std::pair<int, std::string>, int>, std::string>>
 }
 
 std::vector<Rule> main_algo(automaton a, std::vector<Rule> g){
-    std::cout << "\n\n\n";
     std::vector<Rule> res;
     auto transitions = get_transitions(a);
     auto term_rules = get_term_rules(transitions, g);
@@ -181,7 +180,7 @@ std::vector<Rule> main_algo(automaton a, std::vector<Rule> g){
                             }
                             if (!rule_flag){
                                 res.push_back(i);
-                                new_term_rules.push_back({{{{new_term_rules[j].first.first.first.first, i.left}, new_term_rules[k].first.first.second}, ""}, false});
+                                new_term_rules.push_back({{{{new_term_rules[j].first.first.first.first, i.left}, new_term_rules[k].first.first.second}, "!"}, false});
                                 new_term_rules[j].second = true;
                                 new_term_rules[k].second = true;
                                 flag = true;
@@ -205,7 +204,7 @@ std::vector<Rule> main_algo(automaton a, std::vector<Rule> g){
     }
 
     for (int i = 0; i < res.size(); i++){
-        if (res[i].right.empty() || res[i].right[0].empty()){
+        if (res[i].right.empty() || res[i].right[0] == "!"){
             res.erase(res.begin() + i);
         }
     }
