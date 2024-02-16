@@ -1,13 +1,10 @@
 #include "automat.cpp"
+#include "generate_words.cpp"
 
-struct Rule {
-    std::string left;
-    std::vector <std::string> right;
-};
 
 void showRule(const Rule& r) {
     std::cout << r.left << " -> ";
-    for (auto s : r.right) {
+    for (const auto& s : r.right) {
         std::cout << s << " ";
     }
     std::cout << std::endl;
@@ -129,20 +126,28 @@ int main() {
     deleteNonGenerativeRules(G);
     deleteNonAchievableRules(G);
 
-    for (auto rule : G) {
+    for (const auto& rule : G) {
         showRule(rule);
     }
 
+    WordsGen generator(G);
+    std::vector <std::string> words = generator.getWords(6);
+    for (auto word: words) {
+        std::cout << word << std::endl;
+    }
+
+
+
     // regex to automaton
-    std::vector <std::pair <std::string, std::string > > lexemes = lexer(R);
-    std::vector <std::pair <std::string, std::string > > postfix = to_postfix(lexemes);
-    TreeNode* tree = build_tree(postfix);
-    auto res = regex_2_automato(tree);
-    res.show_automaton();
-    res.show_like_arrows();
-    auto res_addit = res.get_addition_automaton();
-    res_addit.show_automaton();
-    res_addit.show_like_arrows();
+//    std::vector <std::pair <std::string, std::string > > lexemes = lexer(R);
+//    std::vector <std::pair <std::string, std::string > > postfix = to_postfix(lexemes);
+//    TreeNode* tree = build_tree(postfix);
+//    auto res = regex_2_automato(tree);
+//    res.show_automaton();
+//    res.show_like_arrows();
+//    auto res_addit = res.get_addition_automaton();
+//    res_addit.show_automaton();
+//    res_addit.show_like_arrows();
 
     return 0;
 }
