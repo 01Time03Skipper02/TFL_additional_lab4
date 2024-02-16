@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "automat.cpp"
 
 struct Rule {
@@ -111,6 +113,76 @@ std::vector<std::pair<std::pair<int, int>, std::string>> get_transitions(automat
             if (matrix[i][j].first != "0"){
                 res.emplace_back(std::pair<int,int>(i, j), matrix[i][j].first);
             }
+        }
+    }
+    return res;
+}
+
+std::vector<std::pair<std::pair<std::pair<int, std::string>, int>, std::string>> get_term_rules(std::vector<std::pair<std::pair<int, int>, std::string>> transitions, std::vector<Rule> rules){
+    std::vector<std::pair<std::pair<std::pair<int, std::string>, int>, std::string>> res;
+    for (auto & rule : rules){
+        if (rule.right.size() == 1){
+            for (auto & transition : transitions){
+                if (rule.right[0] == transition.second){
+                    res.push_back({{{transition.first.first, rule.left}, transition.first.second}, transition.second});
+                }
+            }
+        }
+    }
+    return res;
+}
+
+std::vector<Rule> main_algo(automaton a, std::vector<Rule> g){
+    std::cout << "\n\n\n";
+    std::vector<Rule> res;
+    auto transitions = get_transitions(a);
+    auto term_rules = get_term_rules(transitions, g);
+
+    std::vector<std::pair<std::pair<std::pair<std::pair<int, std::string>, int>, std::string>, bool>> new_term_rules;
+    for (auto & term_rule : term_rules){
+        new_term_rules.emplace_back(term_rule, false);
+    }
+    while (true){
+        bool flag = false;
+        for (auto & i : g){
+            if (i.right.size() > 1){
+                for (int j = 0; j < new_term_rules.size(); j++){
+                    for (int k = 0; k < new_term_rules.size(); k++){
+                        if (j != k && new_term_rules[j].first.first.second == new_term_rules[k].first.first.first.first && new_term_rules[j].first.first.first.second == i.right[0] && new_term_rules[k].first.first.first.second == i.right[1]){
+                            bool rule_flag = false;
+                            for (auto & re : res){
+                                if (re.left == i.left && re.right == i.right){
+                                    rule_flag = true;
+                                }
+                            }
+                            if (!rule_flag){
+                                res.push_back(i);
+                                new_term_rules.push_back({{{{new_term_rules[j].first.first.first.first, i.left}, new_term_rules[k].first.first.second}, ""}, false});
+                                new_term_rules[j].second = true;
+                                new_term_rules[k].second = true;
+                                flag = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (!(flag)){
+            break;
+        }
+    }
+
+    for (auto & new_term_rule : new_term_rules){
+        if (new_term_rule.second){
+            std::string left = new_term_rule.first.first.first.second;
+            std::vector<std::string> right = {new_term_rule.first.second};
+            res.push_back({left, right});
+        }
+    }
+
+    for (int i = 0; i < res.size(); i++){
+        if (res[i].right.empty() || res[i].right[0].empty()){
+            res.erase(res.begin() + i);
         }
     }
     return res;

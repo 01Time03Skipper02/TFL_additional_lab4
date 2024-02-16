@@ -41,6 +41,8 @@ int main() {
 //    auto res_addit = res.get_addition_automaton();
 //    res_addit.show_automaton();
 //    res_addit.show_like_arrows();
+    automaton res = automaton({1, 0}, {{{"a", false}, {"b", false}}, {{"0", false}, {"b", false}}}, {0, 1});
+    auto res_reg = main_algo(res, G);
 
     return 0;
 }

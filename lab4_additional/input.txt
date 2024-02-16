@@ -1,6 +1,7 @@
-(a|b)*
-S -> A c
-A -> S D
-D -> a D
+a*bb*
+S -> A T
+S -> S S
+T -> S B
+T -> b
 A -> a
-M -> b
+B -> b
