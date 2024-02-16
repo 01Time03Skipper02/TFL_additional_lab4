@@ -7,6 +7,21 @@ struct Rule {
     std::vector <std::string> right;
 };
 
+std::vector<std::string> split(std::string s, std::string delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
+
 void showRule(const Rule& r) {
     std::cout << r.left << " -> ";
     for (auto s : r.right) {
@@ -123,8 +138,17 @@ std::vector<std::pair<std::pair<std::pair<int, std::string>, int>, std::string>>
     for (auto & rule : rules){
         if (rule.right.size() == 1){
             for (auto & transition : transitions){
-                if (rule.right[0] == transition.second){
-                    res.push_back({{{transition.first.first, rule.left}, transition.first.second}, transition.second});
+                if (rule.right[0].size() == 1){
+                    if (rule.right[0] == transition.second){
+                        res.push_back({{{transition.first.first, rule.left}, transition.first.second}, transition.second});
+                    }
+                } else if (rule.right[0].size() > 1) {
+                    auto splitted_str = split(rule.right[0], "|");
+                    for (const auto & z : splitted_str){
+                        if (z == transition.second){
+                            res.push_back({{{transition.first.first, rule.left}, transition.first.second}, transition.second});
+                        }
+                    }
                 }
             }
         }
