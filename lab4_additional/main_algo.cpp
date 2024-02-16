@@ -195,11 +195,25 @@ std::vector<Rule> main_algo(automaton a, std::vector<Rule> g){
         }
     }
 
+//    std::cout << "========" << std::endl;
+//    for (auto r : res){
+//        showRule(r);
+//    }
+//    std::cout << "========" << std::endl;
+
     for (auto & new_term_rule : new_term_rules){
         if (new_term_rule.second){
             std::string left = new_term_rule.first.first.first.second;
             std::vector<std::string> right = {new_term_rule.first.second};
-            res.push_back({left, right});
+            bool rule_flag = false;
+            for (auto & re : res){
+                if (re.left == left && re.right == right){
+                    rule_flag = true;
+                }
+            }
+            if (!rule_flag){
+                res.push_back({left, right});
+            }
         }
     }
 

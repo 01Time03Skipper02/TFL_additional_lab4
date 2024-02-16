@@ -55,12 +55,16 @@ int main() {
     int k = 6;
     std::vector <std::string> words = generator.getWords(k);
     if (words.empty() || (words.size() == 1 and words[0].empty())){
+        std::cout << "\n";
         auto default_intersect_g = main_algo(res, G);
-        WordsGen generator_2(default_intersect_g);
-        std::vector <std::string> words_2 = generator_2.getWords(k);
-        for (const auto& word : words_2){
-            std::cout << word << std::endl;
+        for (auto r : default_intersect_g){
+            showRule(r);
         }
+//        WordsGen generator_2(default_intersect_g);
+//        std::vector <std::string> words_2 = generator_2.getWords(k);
+//        for (const auto& word : words_2){
+//            std::cout << word << std::endl;
+//        }
     } else {
         std::cout << "ERROR" << std::endl;
     }
