@@ -1,9 +1,5 @@
 #include <utility>
 
-//
-// Created by march on 16.02.2024.
-//
-
 struct Rule;
 
 //bool operator< (const std::string& s1, const std::string& s2) {
