@@ -137,12 +137,13 @@ int main() {
     std::vector <std::pair <std::string, std::string > > lexemes = lexer(R);
     std::vector <std::pair <std::string, std::string > > postfix = to_postfix(lexemes);
     TreeNode* tree = build_tree(postfix);
-    auto res = regex_2_automato(tree);
-    res.show_automaton();
-    res.show_like_arrows();
-    auto res_addit = res.get_addition_automaton();
-    res_addit.show_automaton();
-    res_addit.show_like_arrows();
+
+//    auto res = regex_2_automato(tree);
+//    res.show_automaton();
+//    res.show_like_arrows();
+//    auto res_addit = res.get_addition_automaton();
+//    res_addit.show_automaton();
+//    res_addit.show_like_arrows();
 
     return 0;
 }
