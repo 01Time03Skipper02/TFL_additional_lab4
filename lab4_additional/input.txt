@@ -1,9 +1,7 @@
 a*bb*b
-S -> A T
 S -> A K
-K -> S B
+S -> G B
+K -> B B
+G -> B A
 A -> a
-T -> S G
-G -> B B
 B -> b
-S ->
