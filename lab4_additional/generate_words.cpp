@@ -113,18 +113,24 @@ public:
     }
 
     std::vector<std::string> getWords(int k) {
-        std::string res;
-        Rule start_rule;
+        std::vector <std::string> res;
+        std::vector <Rule> start_rules;
         for (const auto & i : G){
             if (i.left[0] == 'S'){
-                start_rule = i;
+                start_rules.push_back(i);
                 break;
             }
         }
-        for (const auto& s : start_rule.right) {
-            res += s;
+        for (const auto& start_rule : start_rules) {
+            std::string w;
+            for (const auto &s: start_rule.right) {
+                w += s;
+            }
+            res.push_back(w);
         }
-        genWordsRec(res, k);
+        for (const auto& w : res) {
+            genWordsRec(w, k);
+        }
         std::vector<std::string> res_words;
         for (auto& word : words) {
             res_words.push_back(applyFold(word));
